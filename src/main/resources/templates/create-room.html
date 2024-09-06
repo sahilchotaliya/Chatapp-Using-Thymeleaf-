@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Create a Chat Room</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+           background-color: #202632;/* Dark black background */
+            color: #ffffff; /* White font */
+        }
+        .container {
+            background-color: #000000; /* Slightly lighter black for contrast */
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5); /* Stronger shadow for depth */
+            max-width: 400px;
+            width: 100%;
+        }
+        h1 {
+            color: #00aaff; /* Blue color for the title */
+            text-align: center;
+            margin-bottom: 1.5rem;
+            font-size: 1.8rem;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7); /* Text shadow for depth */
+        }
+        form {
+            display: flex;
+            flex-direction: column;
+        }
+        input {
+            margin: 10px 0;
+            padding: 12px;
+            border: 1px solid #444;
+            border-radius: 6px;
+            background-color: #333; /* Dark input background */
+            color: #ffffff; /* White font for input text */
+            font-size: 1rem;
+        }
+        input::placeholder {
+            color: #888; /* Lighter placeholder text */
+        }
+        button {
+            padding: 12px;
+            background-color: #00aaff; /* Blue button */
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background-color 0.3s ease;
+            margin-top: 10px;
+            box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.6); /* Button shadow for depth */
+        }
+        button:hover {
+            background-color: #008fcc; /* Darker blue on hover */
+        }
+        button:active {
+            background-color: #0077aa; /* Even darker blue when active */
+        }
+         .file-input-wrapper {
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
+            margin: 10px 0;
+        }
+        .file-input-wrapper input[type=file] {
+            font-size: 100px;
+            position: absolute;
+            left: 0;
+            top: 0;
+            opacity: 0;
+        }
+        .file-input-wrapper .btn {
+            display: inline-block;
+            padding: 8px 12px;
+            background: #555;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>Create a Chat Room</h1>
+    <form th:action="@{/create-room}" method="post" enctype="multipart/form-data">
+        <input type="text" name="name" placeholder="Your Name" required>
+        <input type="text" name="roomName" placeholder="Room Name" required>
+        <div class="file-input-wrapper">
+            <button class="btn" type="button">Choose Profile Image</button>
+            <input type="file" name="profileImage" accept="image/*">
+        </div>
+        <small>Profile image is optional. A default image will be used if not provided.</small>
+        <button type="submit">Create Room</button>
+    </form>
+</div>
+<script>
+    document.querySelector('.file-input-wrapper input[type=file]').addEventListener('change', function(e) {
+        var fileName = e.target.files[0].name;
+        document.querySelector('.file-input-wrapper .btn').textContent = fileName;
+    });
+</script>
+</body>
+</html>

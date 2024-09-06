@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Chat Application</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+          background-color:#202632;
+            color: #ffffff; /* White font */
+        }
+        .container {
+            text-align: center;
+            background-color: #000000;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+        }
+        h1 {
+            color: #00aaff; /* Blue color for the title
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+        }
+        .button {
+            display: inline-block;
+            padding: 10px 20px;
+            margin: 10px;
+            background-color: #00aaff;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            transition: background-color 0.3s ease;
+            box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.6); /* Button shadow for depth */
+        }
+        .button:hover {
+            background-color: #008fcc;
+        }
+        .button:active {
+            background-color: #0077aa;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>Welcome to the Chat Application</h1>
+    <a href="/create-room" class="button">Create a Room</a>
+    <a href="/join-room" class="button">Join a Room</a>
+</div>
+</body>
+</html>

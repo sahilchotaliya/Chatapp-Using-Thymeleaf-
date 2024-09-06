@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Join a Chat Room</title>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+              background-color: #202632; /* Dark black background */
+            color: #ffffff; /* White font */
+        }
+        .container {
+            background-color: #000000;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+        }
+        h1 {
+            color: #00aaff; /* Blue color for the title */
+            text-align: center;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+        }
+        form {
+            display: flex;
+            flex-direction: column;
+        }
+        input {
+            margin: 10px 0;
+            padding: 10px;
+            border: 1px solid #333333;
+            border-radius: 4px;
+            background-color: #333333;
+            color: #ffffff;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #00aaff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.6);
+        }
+        button:hover {
+            background-color: #008fcc;
+        }
+        button:active {
+            background-color: #0077aa;
+        }
+          .file-input-wrapper {
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
+            margin: 10px 0;
+        }
+        .file-input-wrapper input[type=file] {
+            font-size: 100px;
+            position: absolute;
+            left: 0;
+            top: 0;
+            opacity: 0;
+        }
+        .file-input-wrapper .btn {
+            display: inline-block;
+            padding: 8px 12px;
+            background: #555;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>Join a Chat Room</h1>
+    <form id="joinRoomForm" method="post">
+        <input type="text" name="name" placeholder="Your Name" required>
+        <input type="text" name="roomCode" placeholder="Room Code" required>
+        <button type="submit">Join Room</button>
+    </form>
+</div>
+<script>
+    $(document).ready(function() {
+        $('#joinRoomForm').submit(function(e) {
+            e.preventDefault();
+            $.ajax({
+                url: '/join-room',
+                type: 'POST',
+                data: $(this).serialize(),
+                success: function(response) {
+                    window.location.href = response.redirect;
+                },
+                error: function(xhr) {
+                    if (xhr.status === 404) {
+                        Swal.fire({
+                            title: 'Error!',
+                            text: 'Room not found. Please check the room code and try again.',
+                            icon: 'error',
+                            confirmButtonText: 'OK'
+                        });
+                    } else {
+                        Swal.fire({
+                            title: 'Error!',
+                            text: 'An unexpected error occurred. Please try again later.',
+                            icon: 'error',
+                            confirmButtonText: 'OK'
+                        });
+                    }
+                }
+            });
+        });
+    });
+</script>
+</body>
+</html>
