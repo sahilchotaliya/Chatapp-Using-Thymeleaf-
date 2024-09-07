@@ -95,6 +95,16 @@
         .chat-input button:active {
             background-color: #0077aa;
         }
+          .user-status {
+            margin-left: 5px;
+            font-size: 0.8em;
+        }
+        .user-status.online {
+            color: #4CAF50;
+        }
+        .user-status.offline {
+            color: #F44336;
+        }
         .user-info {
             display: flex;
             align-items: center;
@@ -107,9 +117,71 @@
             margin-right: 10px;
             object-fit: cover;
         }
+        .user-list {
+            float: right;
+            width: 200px;
+            background-color: #1a1a1a;
+            padding: 10px;
+            border-radius: 8px;
+            margin-left: 20px;
+        }
+        .user-item {
+            margin-bottom: 10px;
+        }
+        .online {
+            color: #00ff00;
+        }
+        .offline {
+            color: #ff0000;
+        }
+        .typing-indicator {
+    font-style: italic;
+    color: #888;
+    margin-bottom: 10px;
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out;
+    font-size: 14px;
+}
+
+.typing-indicator.typing {
+    opacity: 1;
+}
+
+
+.typing-indicator.typing::after {
+    content: '';
+    display: inline-block;
+    margin-left: 5px;
+    width: 4px;
+    height: 4px;
+    background-color: #888;
+    border-radius: 50%;
+    animation: blink 1s infinite;
+}
+
+@keyframes blink {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0;
+    }
+}
+.system-message {
+            text-align: center;
+            padding: 10px;
+            margin: 5px 0;
+            font-size: 14px;
+            color: #ffffff; /* Default color */
+        }
+        .system-message.join {
+            color: green; /* Color for join messages */
+        }
+        .system-message.leave {
+            color: red; /* Color for leave messages */
+        }
 
     </style>
-
 </head>
 <body>
 <div class="chat-container">
@@ -117,8 +189,9 @@
         <div class="user-info">
             <img th:src="${currentUser.profileImageUrl}" alt="User Avatar" class="user-avatar">
             <span th:text="${currentUser.username}">Username</span>
+            <span class="user-status" id="userStatus"></span>
         </div>
-        <span th:text="${room.name}">Chat Room Name</span>
+        <span th:text="${room.name}">   Chat Room Name</span>
         <span class="room-code" th:text="'Room Code: ' + ${room.code}"></span>
     </div>
     <div class="chat-messages" id="chatMessages">
@@ -129,14 +202,13 @@
             </div>
         </div>
     </div>
+    <div class="typing-indicator" id="typingIndicator"></div>
     <div class="chat-input">
         <form id="messageForm">
             <input type="text" id="message-input" placeholder="Type a message..." required>
             <button type="submit">Send</button>
         </form>
     </div>
-
-
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.5.1/sockjs.min.js"></script>
@@ -146,13 +218,17 @@
     var roomId = [[${room.id}]];
     var currentUser = [[${currentUser.username}]];
     var currentUserAvatar = [[${currentUser.profileImageUrl}]];
+    var typingTimeout = null;
+    var isCreator = [[${isCreator}]];
+
+
 
     console.log("Debug Info:");
     console.log("Room ID:", roomId);
     console.log("Current User:", currentUser);
     console.log("Current User Avatar:", currentUserAvatar);
 
-    function connect() {
+      function connect() {
         var socket = new SockJS('/ws');
         stompClient = Stomp.over(socket);
         stompClient.connect({}, function (frame) {
@@ -160,7 +236,42 @@
             stompClient.subscribe('/topic/messages/' + roomId, function (message) {
                 showMessage(JSON.parse(message.body));
             });
+            stompClient.subscribe('/topic/typing/' + roomId, function (message) {
+                handleTypingIndicator(JSON.parse(message.body));
+            });
+
+            if (!isCreator) {
+                sendJoinMessage();
+            }
         });
+    }
+      function sendJoinMessage() {
+        if (stompClient) {
+            var joinMessage = {
+                sender: currentUser,
+                type: 'JOIN',
+                content: currentUser + ' has joined the room'
+            };
+            stompClient.send("/app/chat/" + roomId, {}, JSON.stringify(joinMessage));
+        }
+    }
+
+    function handleMessage(message) {
+        switch(message.type) {
+            case 'CHAT':
+                showMessage(message);
+                break;
+            case 'JOIN':
+                userJoined(message.sender);
+                 showUserJoined(message);
+                break;
+            case 'LEAVE':
+                userLeft(message.sender);
+                break;
+            case 'TYPING':
+                showTypingIndicator(message.sender);
+                break;
+        }
     }
 
     function sendMessage() {
@@ -173,6 +284,7 @@
             };
             stompClient.send("/app/chat/" + roomId, {}, JSON.stringify(chatMessage));
             document.getElementById('message-input').value = '';
+            sendTypingStop();
         }
     }
 
@@ -198,12 +310,144 @@
         messageArea.scrollTop = messageArea.scrollHeight;
     }
 
+   function handleTypingIndicator(message) {
+    var typingIndicator = document.getElementById('typingIndicator');
+
+    if (message.type === 'TYPING' && message.sender !== currentUser) {
+        typingIndicator.textContent = message.sender + ' is typing';
+        typingIndicator.classList.add('typing');
+    } else if (message.type === 'STOP_TYPING' && message.sender !== currentUser) {
+        typingIndicator.textContent = '';
+        typingIndicator.classList.remove('typing');
+    }
+}
+
+
+   function userJoined(username) {
+    var userList = document.getElementById('userList');
+    var userItem = document.createElement('div');
+    userItem.id = 'user-' + username;
+    userItem.className = 'user-item';
+    userItem.style.color = 'green'; // Set font color to green
+    userItem.innerHTML = username + ' <span class="online">●</span>';
+    userList.appendChild(userItem);
+}
+
+       function sendJoinMessage() {
+        if (stompClient) {
+            var joinMessage = {
+                sender: currentUser,
+                type: 'JOIN',
+                content: currentUser + ' has joined the room'
+            };
+            stompClient.send("/app/chat/" + roomId, {}, JSON.stringify(joinMessage));
+        }
+    }
+    function showUserJoined(message) {
+    var messageArea = document.getElementById('chatMessages');
+    var joinMessage = document.createElement('div');
+    joinMessage.className = 'system-message join';
+
+    joinMessage.textContent = message.content;
+    messageArea.appendChild(joinMessage);
+    messageArea.scrollTop = messageArea.scrollHeight;
+}
+
+function showUserLeft(message) {
+    var messageArea = document.getElementById('chatMessages');
+    var leaveMessage = document.createElement('div');
+    leaveMessage.className = 'system-message leave';
+    leaveMessage.textContent = message.content;
+    messageArea.appendChild(leaveMessage);
+    messageArea.scrollTop = messageArea.scrollHeight;
+
+    if (message.sender === currentUser) {
+        updateUserStatus('offline');
+    }
+}
+
+
+    function updateUserStatus(status) {
+        var userStatusElement = document.getElementById('userStatus');
+        userStatusElement.textContent = status;
+        userStatusElement.className = 'user-status ' + status;
+    }
+
+    function userLeft(username) {
+    var userItem = document.getElementById('user-' + username);
+    if (userItem) {
+        userItem.querySelector('span').className = 'offline';
+        userItem.style.color = 'red'; // Set font color to red
+    }
+}
+
+
+    function showTypingIndicator(username) {
+        var messageArea = document.getElementById('chatMessages');
+        var typingIndicator = document.getElementById('typing-' + username);
+        if (!typingIndicator) {
+            typingIndicator = document.createElement('div');
+            typingIndicator.id = 'typing-' + username;
+            typingIndicator.className = 'typing-indicator';
+            messageArea.appendChild(typingIndicator);
+        }
+        typingIndicator.textContent = username + ' is typing...';
+        setTimeout(function() {
+            typingIndicator.remove();
+        }, 3000);
+    }
+
+    function sendTyping() {
+        if (stompClient) {
+            var typingMessage = {
+                sender: currentUser,
+                type: 'TYPING'
+            };
+            stompClient.send("/app/chat.typing/" + roomId, {}, JSON.stringify(typingMessage));
+        }
+    }
+
+    function sendTypingStop() {
+        if (stompClient) {
+            var typingMessage = {
+                sender: currentUser,
+                type: 'STOP_TYPING'
+            };
+            stompClient.send("/app/chat.stopTyping/" + roomId, {}, JSON.stringify(typingMessage));
+        }
+    }
+
+
+
+     window.onbeforeunload = function() {
+        if (stompClient) {
+            var leaveMessage = {
+                sender: currentUser,
+                type: 'LEAVE',
+                content: currentUser + ' has left the room'
+            };
+            stompClient.send("/app/chat/" + roomId, {}, JSON.stringify(leaveMessage));
+        }
+    };
+
+    document.getElementById('message-input').addEventListener('input', function() {
+        if (typingTimeout) {
+            clearTimeout(typingTimeout);
+        } else {
+            sendTyping();
+        }
+        typingTimeout = setTimeout(function() {
+            sendTypingStop();
+            typingTimeout = null;
+        }, 1000);
+    });
+
     document.getElementById('messageForm').addEventListener('submit', function(e) {
         e.preventDefault();
         sendMessage();
     });
 
-    window.onload = connect;
+   window.onload = connect;
 </script>
 </body>
 </html>

@@ -1,13 +1,12 @@
 package com.web.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+import java.time.LocalDateTime;
 
 @Entity
 @Setter
@@ -21,7 +20,11 @@ public class User {
     private String username;
     private String profileImageUrl;
 
-
+    private boolean online;
+    private LocalDateTime lastSeen;
+    @ManyToOne
+    @JoinColumn(name = "current_room_id")
+    private ChatRoom currentRoom;
 
     // Getters and setters
 }

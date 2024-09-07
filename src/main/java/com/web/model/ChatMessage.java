@@ -22,6 +22,13 @@ public class ChatMessage {
     private LocalDateTime timestamp;
 
 
+    @Enumerated(EnumType.STRING)
+    private MessageType type;
+
+    public enum MessageType {
+        CHAT, JOIN, LEAVE, TYPING,STOP_TYPING,SYSTEM
+    }
+
     @ManyToOne
     private ChatRoom chatRoom;
 
