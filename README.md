@@ -1,4 +1,4 @@
-![image](https://github.com/user-attachments/assets/a3d431a2-76b2-4f6c-9e04-c5e906cddd24)# Chat Application
+# Chat Application
 
 This is a chat application built with Spring Boot and Thymeleaf. The application allows users to create chat rooms where they can share an image and a unique room code. Other users can join the room using the room code to communicate with each other.
 
