@@ -26,7 +26,7 @@ public class ChatMessage {
     private MessageType type;
 
     public enum MessageType {
-        CHAT, JOIN, LEAVE, TYPING,STOP_TYPING,SYSTEM
+        CHAT, JOIN, LEAVE, TYPING,STOP_TYPING,SYSTEM,FILE
     }
 
     @ManyToOne
