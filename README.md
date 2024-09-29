@@ -1,4 +1,4 @@
-# Chat Application
+![image](https://github.com/user-attachments/assets/a3d431a2-76b2-4f6c-9e04-c5e906cddd24)# Chat Application
 
 This is a chat application built with Spring Boot and Thymeleaf. The application allows users to create chat rooms where they can share an image and a unique room code. Other users can join the room using the room code to communicate with each other.
 
@@ -59,3 +59,22 @@ Then
    docker compose up 
 ```
 Access the application at http://localhost:8085.
+
+##screenshots
+
+![image](https://github.com/user-attachments/assets/7e23d2db-1e92-45df-b356-ca5cddb978e9)
+
+![image](https://github.com/user-attachments/assets/7858a4a5-3c24-46d7-a562-187ed3bf56fb)
+
+![image](https://github.com/user-attachments/assets/e65be7dc-50e1-4318-8cab-9275b6b44691)
+
+![image](https://github.com/user-attachments/assets/7c865bad-6f23-4843-9f57-b606215bba75)
+
+![image](https://github.com/user-attachments/assets/b00bd33e-44a3-4373-bd47-bb2ea257fa1a)
+
+![image](https://github.com/user-attachments/assets/27a3bbe6-aede-4d87-a5c1-49a259feb99b)
+
+
+
+
+
